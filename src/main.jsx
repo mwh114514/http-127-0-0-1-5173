@@ -18,6 +18,7 @@ import './project-gallery.css'
 import './motion.css'
 import './about-profile.css'
 import './about-light.css'
+import './responsive.css'
 
 gsap.registerPlugin(ScrollTrigger)
 
