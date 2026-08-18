@@ -1,0 +1,26 @@
+.gallery-window--covered {
+  background-color: #18212d;
+  background-position: center;
+  background-size: cover;
+  border-color: rgba(255, 255, 255, .18);
+  color: #fff;
+}
+
+.gallery-window--covered > span,
+.gallery-window--covered > small,
+.gallery-window--covered > p,
+.gallery-window--covered > em {
+  color: rgba(255, 255, 255, .8);
+}
+
+.gallery-window--covered:hover,
+.gallery-window--covered:focus-visible {
+  background-color: #18212d;
+  background-position: center;
+  background-size: cover;
+  transform: none;
+}
+
+.motion-player { background: #111; }
+.motion-player video { display: block; width: 100%; max-height: 76vh; background: #111; object-fit: contain; }
+.motion-player p { margin: 0; padding: 12px 14px; color: #f5f4ef; font: 10px 'DM Mono', monospace; letter-spacing: .12em; }

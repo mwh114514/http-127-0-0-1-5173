@@ -1,0 +1,38 @@
+.about .portrait,
+.about .about-copy {
+  background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(231,233,230,.9));
+  border-color: rgba(24,24,21,.16);
+  box-shadow: inset 0 1px rgba(255,255,255,.9), 0 20px 54px rgba(29,31,28,.1);
+}
+
+.about .portrait::before {
+  background: repeating-linear-gradient(90deg, transparent 0 47px, rgba(20,20,18,.045) 48px);
+}
+
+.about .portrait-orb {
+  border-color: rgba(20,20,18,.14);
+  background: radial-gradient(circle, rgba(242,115,82,.18), rgba(139,201,194,.08) 48%, transparent 70%);
+}
+
+.about .portrait-face {
+  border-color: rgba(20,20,18,.15);
+  background: #f4f3ee;
+  box-shadow: 0 16px 40px rgba(26,28,25,.12);
+}
+
+.about .portrait-face span,
+.about .portrait > p,
+.about .about-copy h2,
+.about .facts strong,
+.about .outline-link {
+  color: #151513;
+}
+
+.about .portrait-face span { color: #252622; }
+.about .about-copy h2 em { color: #e85f3d; }
+.about .about-copy .body { color: #4c4d48; }
+.about .facts { border-color: rgba(24,24,21,.15); }
+.about .facts span { color: #696a64; }
+.about .facts strong small { color: #e85f3d; }
+.about .outline-link { border-color: rgba(21,21,19,.7); }
+.about .outline-link:hover { color: #e85f3d; border-color: #e85f3d; }

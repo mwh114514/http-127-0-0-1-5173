@@ -1,0 +1,2 @@
+/* At 19 seconds, keep the last video frame as the hero background. */
+.hero--final .hero-video{opacity:1;filter:saturate(.66) contrast(.98) brightness(.58)}

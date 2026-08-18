@@ -1,0 +1,2 @@
+/* Keep the moving image unobstructed; typography is the only foreground layer. */
+.hero-video{filter:saturate(.72) contrast(.98) brightness(.76)!important}.hero--final .hero-video{filter:saturate(.78) contrast(.98) brightness(.8)!important}.hero-wash{background:linear-gradient(90deg,rgba(12,15,14,.47),rgba(12,15,14,.08) 60%,rgba(12,15,14,.22)),linear-gradient(0deg,rgba(12,15,14,.3),transparent 48%)!important}
