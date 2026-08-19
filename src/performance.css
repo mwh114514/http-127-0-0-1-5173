@@ -1,0 +1,47 @@
+.accordion-gallery .ag-panel,
+.accordion-gallery .ag-panel__media {
+  will-change: auto;
+}
+
+.hero-video,
+.bounce-card img,
+.ag-panel__media img {
+  backface-visibility: hidden;
+}
+
+.hero-video::-webkit-media-controls,
+.hero-video::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
+
+@media (max-width: 900px), (pointer: coarse) {
+  .accordion-gallery .ag-panel__media {
+    filter: none !important;
+  }
+
+  .card-nav,
+  .gallery-overlay,
+  .artwork-viewer__backdrop,
+  .artwork-viewer__close,
+  .artwork-viewer__nav {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .gallery-overlay,
+  .artwork-viewer__backdrop {
+    background-color: rgba(15, 15, 14, .94);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

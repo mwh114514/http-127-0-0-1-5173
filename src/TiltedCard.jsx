@@ -1,27 +1,35 @@
-import { useRef } from 'react'
-import { motion, useMotionValue, useSpring } from 'motion/react'
+import { useEffect, useRef } from 'react'
 import './TiltedCard.css'
-
-const spring = { damping: 30, stiffness: 100, mass: 1.6 }
+import './TiltedCard-light.css'
 
 export default function TiltedCard({ children, className = '', rotateAmplitude = 5, scaleOnHover = 1.015 }) {
   const ref = useRef(null)
-  const rotateX = useSpring(useMotionValue(0), spring)
-  const rotateY = useSpring(useMotionValue(0), spring)
-  const scale = useSpring(1, spring)
+  const frame = useRef(0)
+
+  useEffect(() => () => window.cancelAnimationFrame(frame.current), [])
+
+  const update = (rotateX, rotateY, scale) => {
+    window.cancelAnimationFrame(frame.current)
+    frame.current = window.requestAnimationFrame(() => {
+      const inner = ref.current?.firstElementChild
+      if (!inner) return
+      inner.style.setProperty('--tilt-x', `${rotateX}deg`)
+      inner.style.setProperty('--tilt-y', `${rotateY}deg`)
+      inner.style.setProperty('--tilt-scale', scale)
+    })
+  }
 
   const handleMove = event => {
     if (!ref.current || window.matchMedia('(pointer: coarse)').matches) return
     const rect = ref.current.getBoundingClientRect()
     const x = (event.clientX - rect.left) / rect.width - .5
     const y = (event.clientY - rect.top) / rect.height - .5
-    rotateX.set(y * -rotateAmplitude * 2)
-    rotateY.set(x * rotateAmplitude * 2)
+    update(y * -rotateAmplitude * 2, x * rotateAmplitude * 2, scaleOnHover)
   }
 
-  const reset = () => { rotateX.set(0); rotateY.set(0); scale.set(1) }
+  const reset = () => update(0, 0, 1)
 
-  return <motion.div ref={ref} className={`tilted-card-figure ${className}`} onMouseMove={handleMove} onMouseEnter={() => scale.set(scaleOnHover)} onMouseLeave={reset} style={{ rotateX, rotateY, scale }}>
+  return <div ref={ref} className={`tilted-card-figure ${className}`} onPointerMove={handleMove} onPointerEnter={() => update(0, 0, scaleOnHover)} onPointerLeave={reset}>
     <div className="tilted-card-inner">{children}</div>
-  </motion.div>
+  </div>
 }

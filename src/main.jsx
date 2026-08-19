@@ -21,6 +21,7 @@ import './about-light.css'
 import './responsive.css'
 import './fan-responsive.css'
 import './contact-drawer.css'
+import './performance.css'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -77,8 +78,17 @@ function App() {
       }
       video.muted = true
       video.play().catch(() => {
-        // Muted autoplay is retried when enough data is available.
+        // WeChat may wait for its JS bridge or the first touch before allowing playback.
       })
+    }
+
+    const resumeInEmbeddedBrowser = () => {
+      if (freezeRequested || video.ended || video.currentTime >= 18.95) return
+      startPlayback()
+    }
+
+    const resumeWhenVisible = () => {
+      if (document.visibilityState === 'visible') resumeInEmbeddedBrowser()
     }
 
     const observer = new IntersectionObserver(([entry]) => {
@@ -87,6 +97,9 @@ function App() {
 
     video.addEventListener('loadedmetadata', startPlayback)
     video.addEventListener('canplay', startPlayback)
+    document.addEventListener('WeixinJSBridgeReady', resumeInEmbeddedBrowser, false)
+    document.addEventListener('visibilitychange', resumeWhenVisible)
+    document.addEventListener('touchstart', resumeInEmbeddedBrowser, { once: true, passive: true })
     observer.observe(hero)
     startPlayback()
 
@@ -94,6 +107,9 @@ function App() {
       observer.disconnect()
       video.removeEventListener('loadedmetadata', startPlayback)
       video.removeEventListener('canplay', startPlayback)
+      document.removeEventListener('WeixinJSBridgeReady', resumeInEmbeddedBrowser, false)
+      document.removeEventListener('visibilitychange', resumeWhenVisible)
+      document.removeEventListener('touchstart', resumeInEmbeddedBrowser)
     }
   }, [])
   useLayoutEffect(() => {
@@ -161,7 +177,7 @@ function App() {
   return <main ref={rootRef}>
     <section className={filmFinished ? 'hero hero--final' : 'hero'} id="top">
       <div className="opening-curtain" aria-hidden="true" />
-      <video ref={videoRef} className="hero-video" autoPlay muted playsInline preload="auto" disablePictureInPicture onTimeUpdate={stopAtFinalFrame} onEnded={() => setFilmFinished(true)}>
+      <video ref={videoRef} className="hero-video" autoPlay muted playsInline preload="auto" controls={false} disablePictureInPicture webkit-playsinline="true" x5-playsinline="true" x5-video-player-type="h5-page" x5-video-player-fullscreen="false" x5-video-orientation="portrait" onTimeUpdate={stopAtFinalFrame} onEnded={() => setFilmFinished(true)}>
         <source src="/media/hero-film.mp4" type="video/mp4" />
       </video>
       <div className="hero-wash" />

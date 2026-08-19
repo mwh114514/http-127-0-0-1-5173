@@ -8,6 +8,7 @@
   grid-template-rows: auto minmax(0, 1fr);
   width: 100%;
   max-width: none;
+  height: calc(100vh - clamp(20px, 4vw, 56px));
   height: calc(100dvh - clamp(20px, 4vw, 56px));
   min-height: 0;
   padding: clamp(52px, 5vw, 66px) clamp(14px, 3vw, 42px) clamp(14px, 2vw, 26px);
@@ -79,6 +80,7 @@
   }
 
   .gallery-overlay--direct .gallery-dialog {
+    height: 100vh;
     height: 100dvh;
     padding: 54px 12px 12px;
   }
