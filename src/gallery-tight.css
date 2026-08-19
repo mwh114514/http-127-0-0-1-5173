@@ -1,0 +1,18 @@
+.accordion-gallery .ag-panel {
+  border: 1px solid rgba(32, 32, 30, .12);
+  border-radius: 3px;
+}
+
+@media (max-width: 700px) {
+  .accordion-gallery {
+    gap: 6px !important;
+  }
+
+  .accordion-gallery .ag-panel {
+    min-height: 104px;
+  }
+
+  .accordion-gallery .ag-panel--active {
+    min-height: 290px;
+  }
+}

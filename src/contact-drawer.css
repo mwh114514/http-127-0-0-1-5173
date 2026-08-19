@@ -1,0 +1,36 @@
+.contact-drawer {
+  position: relative;
+  z-index: 2;
+  transform-origin: center top;
+  overflow: hidden;
+  will-change: transform;
+}
+
+.contact-drawer h2 {
+  overflow: hidden;
+}
+
+.contact-drawer h2 > span {
+  display: block;
+  will-change: transform, opacity;
+}
+
+.contact-drawer .motion-word,
+.contact-drawer .contact-inner {
+  transform: translateZ(0);
+}
+
+@media (max-width: 700px) {
+  .contact-drawer {
+    min-height: 100svh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-drawer,
+  .contact-drawer h2 > span {
+    transform: none !important;
+    clip-path: none !important;
+    opacity: 1 !important;
+  }
+}

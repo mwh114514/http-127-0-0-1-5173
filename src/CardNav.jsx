@@ -8,9 +8,9 @@ export default function CardNav({ onNavigate }) {
   const cardsRef = useRef([])
   const timelineRef = useRef(null)
   const items = [
-    { label: 'ABOUT', number: '01', target: 'about', text: '个人履历 / 经历与方向' },
-    { label: 'WORK', number: '02', target: 'projects', text: '插画练习 / 精选作品' },
-    { label: 'CONTACT', number: '03', target: 'contact', text: '合作咨询 / 联系方式' }
+    { label: '关于我', number: '01', target: 'about', text: '个人履历 / 经历与方向' },
+    { label: '精选作品', number: '02', target: 'projects', text: '插画练习 / 精选作品' },
+    { label: '联系我', number: '03', target: 'contact', text: '合作咨询 / 联系方式' }
   ]
 
   useLayoutEffect(() => {
@@ -27,7 +27,7 @@ export default function CardNav({ onNavigate }) {
   const toggle = () => { const tl = timelineRef.current; if (!tl) return; setIsOpen(value => { value ? tl.reverse() : tl.play(0); return !value }) }
   const navigate = target => { onNavigate(target); timelineRef.current?.reverse(); setIsOpen(false) }
   return <div className="card-nav-container"><nav ref={navRef} className={isOpen ? 'card-nav card-nav--open' : 'card-nav'}>
-    <div className="card-nav-top"><button className="card-nav-wordmark" onClick={() => navigate('top')}>MOWENHAO<span>®</span></button><div className="card-nav-desktop-links"><button onClick={() => navigate('about')}>ABOUT</button><button onClick={() => navigate('projects')}>SELECTED WORK</button><button onClick={() => navigate('contact')}>CONTACT</button></div><button className="card-nav-toggle" onClick={toggle} aria-expanded={isOpen} aria-label="展开导航"><i></i><i></i><em>{isOpen ? 'CLOSE' : 'MENU'}</em></button></div>
+    <div className="card-nav-top"><button className="card-nav-wordmark" onClick={() => navigate('top')}>MOWENHAO<span>®</span></button><div className="card-nav-desktop-links"><button onClick={() => navigate('about')}>关于我</button><button onClick={() => navigate('projects')}>精选作品</button><button onClick={() => navigate('contact')}>联系我</button></div><button className="card-nav-toggle" onClick={toggle} aria-expanded={isOpen} aria-label="展开导航"><i></i><i></i><em>{isOpen ? '关闭' : '菜单'}</em></button></div>
     <div className="card-nav-content">{items.map((item, index) => <button className="card-nav-item" onClick={() => navigate(item.target)} ref={el => cardsRef.current[index] = el} key={item.target}><span>{item.number}</span><strong>{item.label}</strong><small>{item.text}</small><b>↗</b></button>)}</div>
   </nav></div>
 }

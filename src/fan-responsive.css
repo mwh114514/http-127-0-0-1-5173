@@ -1,0 +1,67 @@
+.portfolio-cards {
+  --fan-step: clamp(105px, 17.5vw, 205px);
+  --fan-step-2: clamp(210px, 35vw, 410px);
+  --fan-edge-y: 28px;
+  --fan-side-y: 0px;
+  --fan-center-y: -18px;
+  width: 100%;
+}
+
+.portfolio-cards .bounce-card {
+  width: clamp(210px, 26vw, 315px);
+  height: auto;
+  aspect-ratio: 2 / 3;
+}
+
+@media (max-width: 850px) {
+  .work-stage {
+    overflow: hidden;
+  }
+
+  .portfolio-cards {
+    --fan-step: clamp(48px, 15.5vw, 126px);
+    --fan-step-2: clamp(96px, 31vw, 252px);
+    --fan-edge-y: 20px;
+    --fan-side-y: 7px;
+    --fan-center-y: 0px;
+    position: relative;
+    display: block;
+    width: 100%;
+    height: clamp(250px, 64vw, 500px);
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    transform: none;
+  }
+
+  .portfolio-cards .bounce-card {
+    position: absolute !important;
+    left: 50% !important;
+    top: 18px !important;
+    width: clamp(116px, 31vw, 250px);
+    height: auto;
+    aspect-ratio: 2 / 3;
+    margin: 0 !important;
+    border-width: clamp(3px, .65vw, 5px);
+    scroll-snap-align: none;
+  }
+
+  .portfolio-cards .bounce-card:nth-child(1) { transform: translate(calc(-50% - var(--fan-step-2)), var(--fan-edge-y)) rotate(-10deg) !important; }
+  .portfolio-cards .bounce-card:nth-child(2) { transform: translate(calc(-50% - var(--fan-step)), var(--fan-side-y)) rotate(-5deg) !important; }
+  .portfolio-cards .bounce-card:nth-child(3) { transform: translate(-50%, var(--fan-center-y)) rotate(0deg) !important; }
+  .portfolio-cards .bounce-card:nth-child(4) { transform: translate(calc(-50% + var(--fan-step)), var(--fan-side-y)) rotate(5deg) !important; }
+  .portfolio-cards .bounce-card:nth-child(5) { transform: translate(calc(-50% + var(--fan-step-2)), var(--fan-edge-y)) rotate(10deg) !important; }
+}
+
+@media (max-width: 480px) {
+  .portfolio-cards {
+    --fan-step: clamp(43px, 14.6vw, 70px);
+    --fan-step-2: clamp(86px, 29.2vw, 140px);
+    height: clamp(225px, 70vw, 330px);
+  }
+
+  .portfolio-cards .bounce-card {
+    width: clamp(108px, 32vw, 154px);
+    top: 10px !important;
+  }
+}

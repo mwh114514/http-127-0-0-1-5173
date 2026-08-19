@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -19,6 +19,8 @@ import './motion.css'
 import './about-profile.css'
 import './about-light.css'
 import './responsive.css'
+import './fan-responsive.css'
+import './contact-drawer.css'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -41,6 +43,59 @@ function App() {
   const rootRef = useRef(null)
   const go = id => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
   const stopAtFinalFrame = event => { if (event.currentTarget.currentTime >= 19) { event.currentTarget.pause(); setFilmFinished(true) } }
+  useEffect(() => {
+    const refreshAtRestoredPosition = () => window.requestAnimationFrame(() => ScrollTrigger.refresh())
+    const timer = window.setTimeout(refreshAtRestoredPosition, 180)
+    window.addEventListener('pageshow', refreshAtRestoredPosition)
+    window.addEventListener('load', refreshAtRestoredPosition)
+    document.fonts?.ready.then(refreshAtRestoredPosition)
+    return () => {
+      window.clearTimeout(timer)
+      window.removeEventListener('pageshow', refreshAtRestoredPosition)
+      window.removeEventListener('load', refreshAtRestoredPosition)
+    }
+  }, [])
+  useEffect(() => {
+    const video = videoRef.current
+    const hero = document.getElementById('top')
+    if (!video || !hero) return undefined
+    let freezeRequested = false
+
+    const freezeOnFinalFrame = () => {
+      freezeRequested = true
+      if (video.readyState < 1) return
+      const safeEnd = Number.isFinite(video.duration) ? Math.max(0, Math.min(19, video.duration - .04)) : 19
+      try { video.currentTime = safeEnd } catch { return }
+      video.pause()
+      setFilmFinished(true)
+    }
+
+    const startPlayback = () => {
+      if (freezeRequested) {
+        freezeOnFinalFrame()
+        return
+      }
+      video.muted = true
+      video.play().catch(() => {
+        // Muted autoplay is retried when enough data is available.
+      })
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting && entry.boundingClientRect.top < 0) freezeOnFinalFrame()
+    }, { threshold: .04 })
+
+    video.addEventListener('loadedmetadata', startPlayback)
+    video.addEventListener('canplay', startPlayback)
+    observer.observe(hero)
+    startPlayback()
+
+    return () => {
+      observer.disconnect()
+      video.removeEventListener('loadedmetadata', startPlayback)
+      video.removeEventListener('canplay', startPlayback)
+    }
+  }, [])
   useLayoutEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined
     const context = gsap.context(() => {
@@ -79,13 +134,34 @@ function App() {
           .fromTo(profile.querySelector('.portrait-face'), { y: 55, opacity: 0 }, { y: 0, opacity: 1, duration: .85, ease: 'power3.out' }, '-=.65')
           .fromTo(profile.querySelector('p'), { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: .65, ease: 'power3.out' }, '-=.45')
       }
+
+      const contact = document.querySelector('.contact-drawer')
+      if (contact) {
+        const compact = window.matchMedia('(max-width: 700px)').matches
+        const drawer = gsap.timeline({
+          scrollTrigger: {
+            trigger: contact,
+            start: 'top 98%',
+            end: compact ? 'top 58%' : 'top 48%',
+            scrub: compact ? .15 : .28,
+            invalidateOnRefresh: true
+          }
+        })
+        drawer
+          .fromTo(contact, { y: compact ? -46 : -110, force3D: true }, { y: 0, force3D: true, ease: 'none', duration: 1 }, 0)
+          .fromTo(contact.querySelector('.motion-word'), { y: compact ? -34 : -70, opacity: 0 }, { y: 0, opacity: 1, ease: 'power2.out', duration: .52 }, .05)
+          .fromTo(contact.querySelector('.eyebrow'), { y: -28, opacity: 0 }, { y: 0, opacity: 1, ease: 'power2.out', duration: .38 }, .2)
+          .fromTo(contact.querySelectorAll('h2 > span'), { yPercent: -105, opacity: 0 }, { yPercent: 0, opacity: 1, stagger: .09, ease: 'power3.out', duration: .5 }, .3)
+          .fromTo(contact.querySelector('.mail'), { y: -30, opacity: 0 }, { y: 0, opacity: 1, ease: 'power2.out', duration: .38 }, .55)
+          .fromTo(contact.querySelectorAll('.contact-foot > *'), { y: -22, opacity: 0 }, { y: 0, opacity: 1, stagger: .05, ease: 'power2.out', duration: .34 }, .66)
+      }
     }, rootRef)
     return () => context.revert()
   }, [])
   return <main ref={rootRef}>
     <section className={filmFinished ? 'hero hero--final' : 'hero'} id="top">
       <div className="opening-curtain" aria-hidden="true" />
-      <video ref={videoRef} className="hero-video" autoPlay muted playsInline preload="auto" onTimeUpdate={stopAtFinalFrame} onEnded={() => setFilmFinished(true)}>
+      <video ref={videoRef} className="hero-video" autoPlay muted playsInline preload="auto" disablePictureInPicture onTimeUpdate={stopAtFinalFrame} onEnded={() => setFilmFinished(true)}>
         <source src="/media/hero-film.mp4" type="video/mp4" />
       </video>
       <div className="hero-wash" />
@@ -97,11 +173,11 @@ function App() {
 
     <section className="about frame motion-section" id="about"><div className="motion-word">PROFILE</div><div className="section-label"><span>01 / PROFILE</span><span>个人履历</span></div><div className="about-grid"><TiltedCard className="profile-tilt" rotateAmplitude={4.5} scaleOnHover={1.012}><div className="portrait profile-portrait"><div className="portrait-orb"></div><div className="portrait-face"><span>M</span></div><p>MO<br/>WEN<br/>HAO</p></div></TiltedCard><TiltedCard className="profile-tilt" rotateAmplitude={3.5} scaleOnHover={1.008}><div className="about-copy motion-card"><h2>我相信优秀的设计，<br />始于<em>敏感的观察。</em></h2><p className="body">莫文昊，插画师 / AI 设计师 / 视频剪辑师。毕业于产品艺术设计专业，拥有品牌视觉与商业项目实习经验。我的工作横跨品牌、插画、动态影像与 AI 视觉实验；在每一次设计中，让理性结构为直觉与情感留出位置。</p><div className="facts"><div><strong>06<small>+</small></strong><span>MONTHS OF<br/>EXPERIENCE</span></div><div><strong>12<small>+</small></strong><span>CREATIVE<br/>PROJECTS</span></div><div><strong>03</strong><span>CORE<br/>DIRECTIONS</span></div></div><a className="outline-link" href="mailto:2281545783@qq.com">下载简历 <i>↓</i></a></div></TiltedCard></div></section>
 
-    <section className="projects frame motion-section" id="projects"><div className="motion-word">SELECTED WORK</div><div className="section-label"><span>02 / SELECTED WORK</span><span>精选项目 · 2024—2026</span></div><div className="project-intro motion-card"><h2>选择一些正在生长的<br/><em>视觉片段。</em></h2><p>五组人物视觉练习，以不同的光、材质与色彩，记录情绪在画面中的流动。</p></div><div className="work-stage"><BounceCards className="portfolio-cards" images={['/media/works/01-aurora.webp','/media/works/02-snow.webp','/media/works/03-profile.webp','/media/works/04-silver.webp','/media/works/05-garden.webp']} transformStyles={['translate(-430px, 28px) rotate(-10deg)','translate(-215px, 0px) rotate(-5deg)','translate(0px, -18px) rotate(0deg)','translate(215px, 0px) rotate(5deg)','translate(430px, 28px) rotate(10deg)']} /><div className="work-caption motion-card"><span>PERSONAL ILLUSTRATION / 2024—2026</span><h3>人物与光影研究</h3><p>将插画作为感知的容器，在人物、材质与想象之间寻找每张画面独有的温度。</p></div></div></section>
+    <section className="projects frame motion-section" id="projects"><div className="motion-word">SELECTED WORK</div><div className="section-label"><span>02 / SELECTED WORK</span><span>精选项目 · 2024—2026</span></div><div className="project-intro motion-card"><h2>选择一些正在生长的<br/><em>视觉片段。</em></h2><p>五组人物视觉练习，以不同的光、材质与色彩，记录情绪在画面中的流动。</p></div><div className="work-stage"><BounceCards className="portfolio-cards" images={['/media/works/01-aurora.webp','/media/works/02-snow.webp','/media/works/03-profile.webp','/media/works/04-silver.webp','/media/works/05-garden.webp']} transformStyles={['translate(calc(-50% - var(--fan-step-2)), var(--fan-edge-y)) rotate(-10deg)','translate(calc(-50% - var(--fan-step)), var(--fan-side-y)) rotate(-5deg)','translate(-50%, var(--fan-center-y)) rotate(0deg)','translate(calc(-50% + var(--fan-step)), var(--fan-side-y)) rotate(5deg)','translate(calc(-50% + var(--fan-step-2)), var(--fan-edge-y)) rotate(10deg)']} /><div className="work-caption motion-card"><span>PERSONAL ILLUSTRATION / 2024—2026</span><h3>人物与光影研究</h3><p>将插画作为感知的容器，在人物、材质与想象之间寻找每张画面独有的温度。</p></div></div></section>
 
     <section className="advantages frame motion-section"><div className="motion-word">EXPERTISE</div><div className="section-label"><span>03 / EXPERTISE</span><span>创作方向</span></div><div className="adv-title motion-card"><h2>技术会迭代，<br/>但<em>感受力</em>始终重要。</h2><p>从场景、角色到影像，选择一个窗口，进入相应的作品系列。</p></div><GalleryWindows /></section>
 
-    <section className="contact motion-section" id="contact"><div className="motion-word">CONTACT</div><div className="contact-glow"></div><div className="contact-inner"><p className="eyebrow motion-card">LET'S MAKE SOMETHING WITH MEANING</p><h2>期待与你<br/><em>共同创作。</em></h2><a href="mailto:2281545783@qq.com" className="mail motion-card">2281545783@qq.com <i>↗</i></a><div className="contact-foot"><div className="motion-card"><span>PHONE</span><a href="tel:15697760186">156 9776 0186</a></div><div className="motion-card"><span>LOCATION</span><p>广西 · 中国</p></div><div className="motion-card"><span>WECHAT</span><p>Mowenhao</p></div><button className="motion-card" onClick={() => go('top')}>BACK TO TOP ↑</button></div></div></section>
+    <section className="contact contact-drawer" id="contact"><div className="motion-word">CONTACT</div><div className="contact-glow"></div><div className="contact-inner"><p className="eyebrow">LET'S MAKE SOMETHING WITH MEANING</p><h2><span>期待与你</span><span><em>共同创作。</em></span></h2><a href="mailto:2281545783@qq.com" className="mail">2281545783@qq.com <i>↗</i></a><div className="contact-foot"><div><span>PHONE</span><a href="tel:15697760186">156 9776 0186</a></div><div><span>LOCATION</span><p>广西 · 中国</p></div><div><span>WECHAT</span><p>Mowenhao</p></div><button onClick={() => go('top')}>BACK TO TOP ↑</button></div></div></section>
   </main>
 }
 createRoot(document.getElementById('root')).render(<App />)

@@ -1,7 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import './gallery-windows.css'
 import './gallery-covers.css'
 import './gallery-viewer.css'
+import './gallery-tight.css'
+import './gallery-direct.css'
 import AccordionGallery from './AccordionGallery'
 
 const windows = [
@@ -38,9 +41,20 @@ export default function GalleryWindows() {
   const current = windows.find(item => item.id === active)
   const gallery = galleries[active]
 
+  useEffect(() => {
+    if (!active) return undefined
+    document.body.style.overflow = 'hidden'
+    const close = event => { if (event.key === 'Escape') { setZoomed(null); setActive(null) } }
+    window.addEventListener('keydown', close)
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', close)
+    }
+  }, [active])
+
   return <>
-    <AccordionGallery items={windows} defaultIndex={0} expandRatio={.48} height={430} gap={0} tilt={4} onSelect={setActive} />
-    {active && <div className="gallery-overlay" role="dialog" aria-modal="true" aria-label={current.title} onClick={() => { setActive(null); setZoomed(null) }}>
+    <AccordionGallery items={windows} defaultIndex={0} expandRatio={.46} height={400} gap={6} tilt={2.5} onSelect={setActive} />
+    {active && createPortal(<div className="gallery-overlay gallery-overlay--direct" role="dialog" aria-modal="true" aria-label={current.title} onClick={() => { setActive(null); setZoomed(null) }}>
       <div className="gallery-dialog" onClick={event => event.stopPropagation()}>
         <button className="gallery-close" onClick={() => { setActive(null); setZoomed(null) }}>CLOSE ×</button>
         <div className="gallery-dialog-head"><span>{current.no} / {current.en}</span><h3>{current.title}</h3><p>{current.description}</p></div>
@@ -51,6 +65,6 @@ export default function GalleryWindows() {
           : <div className="empty-gallery"><span>{current.count}</span><p>该系列正在整理中，敬请期待。</p></div>}
       </div>
       {zoomed && <div className="gallery-lightbox" role="dialog" aria-modal="true" aria-label="作品大图" onClick={event => { event.stopPropagation(); setZoomed(null) }}><button aria-label="关闭大图" onClick={() => setZoomed(null)}>CLOSE ×</button><img src={zoomed} alt="作品大图" /></div>}
-    </div>}
+    </div>, document.body)}
   </>
 }
